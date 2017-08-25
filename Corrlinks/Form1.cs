@@ -76,6 +76,7 @@ namespace Corrlinks
             ReadFromInbox();
             SubmitInbox();
             ProcessOutbox();
+            ValidateSentMessages();
             mChrome.GoToUrl("https://www.corrlinks.com/Default.aspx");
         }
 
@@ -243,11 +244,7 @@ namespace Corrlinks
                 UpdateStatus("Number of message characters or lines may have exceeded limit.");
             }
 
-            UpdateStatus("Close Alert if shows");
-
-            bool res = mChrome.TryCloseAlert();
-            if (res) UpdateStatus("Closed");
-            else UpdateStatus("Not showed");
+            mChrome.TryCloseAlert();
 
             try
             {
@@ -287,18 +284,41 @@ namespace Corrlinks
             return addressFound;
         }
 
-        private void fillOutboxWithSample()
+        private void ValidateSentMessages()
         {
-            mChrome.GoToUrl("https://www.corrlinks.com/NewMessage.aspx");
+            UpdateStatus("Validating Sent Messages");
+            UpdateStatus(statusSeperator);
+            mChrome.GoToUrl("https://www.corrlinks.com/SentMessages.aspx");
             Thread.Sleep(1000);
 
-            String message = "";
-            for(int i = 0; i < 200; i ++)
+            List<string> messageIDs = new List<string>();
+            try
             {
-                message += i.ToString() + "\n";
+                for(int i = 2; i < 12; i ++)
+                {
+                    IWebElement ele = mChrome.FindByXPath("//table[@class='MessageDataGrid PhotoMessageDataGrid']//tr[" + i.ToString() + "]//td//a[@class='tooltip'][1]");
+                    if (ele == null) break;
+                    string subject = ele.GetAttribute("innerHTML");
+
+                    bool messageIDAvailable = subject.IndexOf('[') == -1 ? false : true;
+                    if (!messageIDAvailable) break;
+
+                    string messageID = subject.Substring(subject.IndexOf('[') + 1, subject.IndexOf(']') - subject.IndexOf('[') - 1);
+                    messageIDs.Add(messageID);
+                }
+
+                string validationURL = "http://ddtext.com/corrlinks/sentmessage-update.php?";
+                for(int i = 0; i < messageIDs.Count; i ++)
+                {
+                    validationURL += "msgID[]=" + messageIDs[i] + "&";
+                }
+
+                string validationResult = MyUtil.GetRequest(validationURL);
+                UpdateStatus(validationResult);
             }
-            mChrome.FindById("ctl00_mainContentPlaceHolder_messageTextBox").SendKeys(message);
-            mChrome.TryCloseAlert();
+            catch (Exception ex)
+            {
+            }
         }
 
         private void UpdateStatus(String status)
