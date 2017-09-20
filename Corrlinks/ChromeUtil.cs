@@ -18,7 +18,7 @@ namespace Corrlinks
             option.AddArguments("--disable-notifications");        //disable notifications
             option.AddArguments("--disable-web-security");         //disable save password windows
             option.AddUserProfilePreference("credentials_enable_service", false);
-            option.AddUserProfilePreference("disable-popup-blocking", "true");
+            //option.AddUserProfilePreference("disable-popup-blocking", "true");
             //option.AddArgument("--window-position=-32000,-32000");
             mNavigator = new ChromeDriver(mDriverService, option);
         }
@@ -67,7 +67,21 @@ namespace Corrlinks
                 string script = "document.getElementById('" + id + "').value=`" + value + "`";
                 mNavigator.ExecuteScript(script);
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public bool RunJavascript(String code)
+        {
+            try
+            {
+                mNavigator.ExecuteScript(code);
+                return true;
+            }
+            catch (Exception ex)
             {
                 return false;
             }

@@ -24,6 +24,7 @@ namespace Corrlinks
         private const int messageBodyLimit = 13000;
         private ChromeUtil mChrome;
         private Thread openBrowserThread;
+        private Thread scanContactListThread;
         private Thread mainProcessingThread;
 
         List<MessageIn> inbox = new List<MessageIn>();
@@ -47,6 +48,77 @@ namespace Corrlinks
         {
             mainProcessingThread = new Thread(new ThreadStart(Run));
             mainProcessingThread.Start();
+        }
+        
+        private void btn_scan_contact_Click(object sender, EventArgs e)
+        {
+            scanContactListThread = new Thread(new ThreadStart(ScanContactList));
+            scanContactListThread.Start();
+        }
+        private List<String> addressList;
+        private void ScanContactList()
+        {
+            addressList = new List<String>();
+            if(mChrome == null)
+            {
+                MessageBox.Show("Please open the browser by clicking open button");
+                return;
+            }
+            mChrome.GoToUrl("https://www.corrlinks.com/RegisterInmate.aspx");
+            int i = 1;
+            while (true)
+            {
+                String code = "__doPostBack('ctl00$mainContentPlaceHolder$AddInmatesUC$InmateAddGridView', 'Page$" + i.ToString() + "')";
+                Boolean result = mChrome.RunJavascript(code);
+                if(result)
+                {
+                    Thread.Sleep(5000);
+                    result = false;
+                    IWebElement pagerEle = mChrome.FindByXPath("//tr[@class='Pager']//table//tr//td//span[1]");
+                    if (pagerEle != null)
+                    {
+                        int pageID;
+                        try
+                        {
+                            pageID = Convert.ToInt32(pagerEle.Text);
+                        }
+                        catch (Exception)
+                        {
+                            pageID = -1;
+                        }
+                        if (pageID != i) break;
+                        else // Get Inmate IDs
+                        {
+                            for (int j = 2; j < 12; j++)
+                            {
+                                IWebElement ele = mChrome.FindByXPath("//table[@class='MessageDataGrid']//tr[" + j.ToString() + "]//td[@class='MessageDataGrid Item'][1]");
+                                if (ele == null) continue;
+                                string address = ele.GetAttribute("innerHTML");
+                                
+                                addressList.Add(address);
+                                UpdateStatus(address);
+                            }
+                            UpdateStatus(statusSeperator);
+                        }
+                        result = true;
+                        i++;
+                    } else
+                    {
+                        break;
+                    }
+                }
+            }
+            String addressListStr = "";
+            for(i = 0; i < addressList.Count; i++)
+            {
+                addressListStr += addressList[i] + ",";
+            }
+            // Upload address list to php
+            addressListStr = addressListStr.Substring(0, addressListStr.Length - 1);
+            mChrome.GoToUrl("http://ddtext.com/corrlinks/address-book-scan-upload.php");
+            mChrome.FindByAttr("textarea", "name", "textbox", 1).SendKeys(addressListStr);
+            mChrome.FindByAttr("input", "name", "submit", 1).Click();
+            UpdateStatus("Finished scanning addresses");
         }
 
         private void OpenBrowser()
@@ -73,10 +145,10 @@ namespace Corrlinks
         {
             mChrome.GoToUrl("https://www.corrlinks.com/Default.aspx");
             Thread.Sleep(1000);
+            inbox.Clear();
             ReadFromInbox();
             SubmitInbox();
             ProcessOutbox();
-            ValidateSentMessages();
             mChrome.GoToUrl("https://www.corrlinks.com/Default.aspx");
         }
 
@@ -169,9 +241,12 @@ namespace Corrlinks
                 k++;
                 SendMessage(messageOut);
                 messageOut = CheckOutbox();
+                if(k % 7 == 0)
+                    ValidateSentMessages();
             }
             UpdateStatus("Message checked out " + k.ToString());
 
+            ValidateSentMessages();
             UpdateStatus(statusSeperator);
             UpdateStatus("Finished processing for sending messages...");
         }
@@ -236,12 +311,9 @@ namespace Corrlinks
 
             UpdateStatus("Fill the message body");
 
-            try
+            if(!mChrome.SetTextByID("ctl00_mainContentPlaceHolder_messageTextBox", msg.MESSAGE))
             {
-                mChrome.SetTextByID("ctl00_mainContentPlaceHolder_messageTextBox", msg.MESSAGE);
-            } catch
-            {
-                UpdateStatus("Number of message characters or lines may have exceeded limit.");
+                mChrome.FindById("ctl00_mainContentPlaceHolder_messageTextBox").SendKeys(msg.MESSAGE);
             }
 
             mChrome.TryCloseAlert();
@@ -297,11 +369,11 @@ namespace Corrlinks
                 for(int i = 2; i < 12; i ++)
                 {
                     IWebElement ele = mChrome.FindByXPath("//table[@class='MessageDataGrid PhotoMessageDataGrid']//tr[" + i.ToString() + "]//td//a[@class='tooltip'][1]");
-                    if (ele == null) break;
+                    if (ele == null) continue;
                     string subject = ele.GetAttribute("innerHTML");
 
                     bool messageIDAvailable = subject.IndexOf('[') == -1 ? false : true;
-                    if (!messageIDAvailable) break;
+                    if (!messageIDAvailable) continue;
 
                     string messageID = subject.Substring(subject.IndexOf('[') + 1, subject.IndexOf(']') - subject.IndexOf('[') - 1);
                     messageIDs.Add(messageID);
