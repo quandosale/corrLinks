@@ -37,6 +37,8 @@
             this.txt_password = new System.Windows.Forms.TextBox();
             this.txt_status = new System.Windows.Forms.RichTextBox();
             this.btn_scan_contact = new System.Windows.Forms.Button();
+            this.btn_accept_contacts = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btn_open_browser
@@ -93,29 +95,51 @@
             // 
             // txt_status
             // 
-            this.txt_status.Location = new System.Drawing.Point(15, 96);
+            this.txt_status.Location = new System.Drawing.Point(15, 124);
             this.txt_status.Name = "txt_status";
             this.txt_status.ReadOnly = true;
-            this.txt_status.Size = new System.Drawing.Size(347, 332);
+            this.txt_status.Size = new System.Drawing.Size(347, 304);
             this.txt_status.TabIndex = 7;
             this.txt_status.Text = "";
             this.txt_status.TextChanged += new System.EventHandler(this.statusChaged);
             // 
             // btn_scan_contact
             // 
-            this.btn_scan_contact.Location = new System.Drawing.Point(15, 67);
+            this.btn_scan_contact.Location = new System.Drawing.Point(15, 95);
             this.btn_scan_contact.Name = "btn_scan_contact";
-            this.btn_scan_contact.Size = new System.Drawing.Size(347, 23);
+            this.btn_scan_contact.Size = new System.Drawing.Size(169, 23);
             this.btn_scan_contact.TabIndex = 8;
             this.btn_scan_contact.Text = "Scan Contacts";
             this.btn_scan_contact.UseVisualStyleBackColor = true;
             this.btn_scan_contact.Click += new System.EventHandler(this.btn_scan_contact_Click);
+            // 
+            // btn_accept_contacts
+            // 
+            this.btn_accept_contacts.Location = new System.Drawing.Point(190, 95);
+            this.btn_accept_contacts.Name = "btn_accept_contacts";
+            this.btn_accept_contacts.Size = new System.Drawing.Size(172, 23);
+            this.btn_accept_contacts.TabIndex = 9;
+            this.btn_accept_contacts.Text = "Accept New Contacts";
+            this.btn_accept_contacts.UseVisualStyleBackColor = true;
+            this.btn_accept_contacts.Click += new System.EventHandler(this.btn_accept_contacts_Click);
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(258, 66);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(104, 23);
+            this.button1.TabIndex = 10;
+            this.button1.Text = "Stop";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.Stop);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(374, 440);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.btn_accept_contacts);
             this.Controls.Add(this.btn_scan_contact);
             this.Controls.Add(this.txt_status);
             this.Controls.Add(this.txt_password);
@@ -127,7 +151,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Corrlinks Automation - v1.5";
+            this.Text = "Corrlinks Automation - v1.6";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.onClose);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -144,6 +168,8 @@
         private System.Windows.Forms.TextBox txt_password;
         private System.Windows.Forms.RichTextBox txt_status;
         private System.Windows.Forms.Button btn_scan_contact;
+        private System.Windows.Forms.Button btn_accept_contacts;
+        private System.Windows.Forms.Button button1;
     }
 }
 

@@ -17,6 +17,7 @@ namespace Corrlinks
             option.AddArguments("disable-infobars");               //disable test automation message
             option.AddArguments("--disable-notifications");        //disable notifications
             option.AddArguments("--disable-web-security");         //disable save password windows
+            option.AddArguments("--window-size=1220,1024");
             option.AddUserProfilePreference("credentials_enable_service", false);
             //option.AddUserProfilePreference("disable-popup-blocking", "true");
             //option.AddArgument("--window-position=-32000,-32000");
@@ -26,6 +27,11 @@ namespace Corrlinks
         public void GoToUrl(string url)
         {
             mNavigator.Navigate().GoToUrl(url);
+        }
+
+        public void Back()
+        {
+            mNavigator.Navigate().Back();
         }
 
         public IWebElement FindById(string id)

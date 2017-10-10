@@ -25,6 +25,7 @@ namespace Corrlinks
         private ChromeUtil mChrome;
         private Thread openBrowserThread;
         private Thread scanContactListThread;
+        private Thread acceptContactListThread;
         private Thread mainProcessingThread;
 
         List<MessageIn> inbox = new List<MessageIn>();
@@ -143,6 +144,11 @@ namespace Corrlinks
         
         private void Run()
         {
+            if (mChrome == null)
+            {
+                MessageBox.Show("Please open the browser by clicking open button");
+                return;
+            }
             mChrome.GoToUrl("https://www.corrlinks.com/Default.aspx");
             Thread.Sleep(1000);
             inbox.Clear();
@@ -157,10 +163,20 @@ namespace Corrlinks
             UpdateStatus("Start processing for new messages...");
             UpdateStatus(statusSeperator);
             // Open Email box
-            mChrome.FindById("ctl00_mainContentPlaceHolder_mailboxImageButton").Click();
-            mChrome.FindByAttr("a", "href", "Inbox.aspx", 1).Click();
+            //mChrome.FindByAttr("a", "href", "Inbox.aspx", 1).Click();
             // Open new messages
-            mChrome.FindById("ctl00_mainContentPlaceHolder_UnreadMessages").Click();
+            try
+            {
+                mChrome.FindById("ctl00_mainContentPlaceHolder_newMessageLink").Click();
+            } catch
+            {
+
+                UpdateStatus("No new messages found");
+                UpdateStatus("Finished processing for new messages...");
+                UpdateStatus(statusSeperator);
+                mChrome.GoToUrl("https://www.corrlinks.com/Default.aspx");
+                return;
+            }
 
             Thread.Sleep(2000);
 
@@ -180,8 +196,9 @@ namespace Corrlinks
             {
                 try
                 {
+                    Thread.Sleep(4000);
                     mChrome.FindByXPath("//table[@class='MessageDataGrid']/tbody/tr[" + (2).ToString() + "]").Click();
-                    Thread.Sleep(1000);
+                    Thread.Sleep(4000);
 
                     MessageIn message = new MessageIn();
                     message.FROM = mChrome.FindById("ctl00_mainContentPlaceHolder_fromTextBox").GetAttribute("value");
@@ -192,15 +209,13 @@ namespace Corrlinks
                     message.TIMESTAMP = new DateTime();
 
                     inbox.Add(message);
-
                     mChrome.FindById("ctl00_mainContentPlaceHolder_cancelButton").Click();
-
+                    
                     UpdateStatus("Read message from " + message.FROM);
-                    Thread.Sleep(1000);
                 }
-                catch
+                catch (Exception ex)
                 {
-
+                    UpdateStatus(ex.Message);
                 }
             }
 
@@ -419,7 +434,77 @@ namespace Corrlinks
         {
             if (openBrowserThread != null) openBrowserThread.Abort();
             if (mainProcessingThread != null) mainProcessingThread.Abort();
+            if (scanContactListThread != null) scanContactListThread.Abort();
+            if (acceptContactListThread != null) acceptContactListThread.Abort();
             if (mChrome != null) mChrome.Quit();
+        }
+
+        private void btn_accept_contacts_Click(object sender, EventArgs e)
+        {
+            acceptContactListThread = new Thread(new ThreadStart(acceptContactList));
+            acceptContactListThread.Start();
+        }
+
+        private void acceptContactList()
+        {
+            if (mChrome == null)
+            {
+                MessageBox.Show("Please open the browser by clicking open button");
+                return;
+            }
+            WebRequest request = null;
+            WebResponse response = null;
+            Stream resStream = null;
+            StreamReader resReader = null;
+            try
+            {
+                UpdateStatus("Fetching new contact codes");
+                string uristring = "http://ddtext.com/corrlinks/get-idcodes.php";
+                request = WebRequest.Create(uristring.Trim());
+                response = request.GetResponse();
+                resStream = response.GetResponseStream();
+                resReader = new StreamReader(resStream);
+                string resstring = resReader.ReadToEnd();
+                //string resstring = "WGJWKLWM,3GKWVVR2,G7XRFGDY,NWFVKGND,NQ72LF7F,MP11RY31,822BN8P5,YNLC5HPM,2Q8CLC37,84DG3JC1,S16H4GMP,5CYSVW2L,4TN1M72H,7YTY1257,W1D6F664,734VSC2Y,M47N2747,6G34TPH7,4B3Y2MLP";
+                String[] codes = resstring.Split(',');
+                for(int i = 0; i < codes.Length; i ++)
+                {
+                    UpdateStatus(codes[i]);
+                }
+                UpdateStatus("Done");
+
+                mChrome.GoToUrl("https://www.corrlinks.com/PendingContact.aspx");
+                string alert = mChrome.FindById("ctl00_mainContentPlaceHolder_pnlMessage").Text;
+                var startPos = 9;
+                var endPos = alert.IndexOf(" new contact");
+                string strContactCount = alert.Substring(9, endPos - 9);
+                int contactCount = Convert.ToInt32(strContactCount);
+                for (int i = 0; i < contactCount; i++)
+                {
+                    mChrome.SetTextByID("ctl00_mainContentPlaceHolder_PendingContactUC1_InmateNumberTextBox", codes[i]);
+                    mChrome.FindById("ctl00_mainContentPlaceHolder_PendingContactUC1_SearchButton").Click();
+                    Thread.Sleep(1000);
+                    IWebElement acceptBtn = mChrome.FindById("ctl00_mainContentPlaceHolder_PendingContactUC1_addInmateButton");
+                    if (acceptBtn != null) acceptBtn.Click();
+                    Thread.Sleep(2000);
+                }
+            }
+            catch (Exception ex)
+            {
+                UpdateStatus(ex.Message);
+            }
+            finally
+            {
+                if (resReader != null) resReader.Close();
+                if (response != null) response.Close();
+            }
+        }
+
+        private void Stop(object sender, EventArgs e)
+        {
+            if (openBrowserThread != null) openBrowserThread.Abort();
+            if (mainProcessingThread != null) mainProcessingThread.Abort();
+            UpdateStatus("Stopped Read/Send cycle...");
         }
     }
 }
