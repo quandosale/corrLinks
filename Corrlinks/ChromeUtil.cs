@@ -68,9 +68,12 @@ namespace Corrlinks
 
         public bool SetTextByID(string id, string value)
         {
+            string script;
             try
             {
-                string script = "document.getElementById('" + id + "').value=`" + value + "`";
+                value = value.Replace("\"", "\\\"");
+                value = value.Replace("\n", "\\n");
+                script = "document.getElementById('" + id + "').value=\"" + value + "\"";
                 mNavigator.ExecuteScript(script);
                 return true;
             }

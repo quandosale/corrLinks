@@ -153,7 +153,7 @@ namespace Corrlinks
             Thread.Sleep(1000);
             inbox.Clear();
             ReadFromInbox();
-            SubmitInbox();
+            //SubmitInbox();
             ProcessOutbox();
             mChrome.GoToUrl("https://www.corrlinks.com/Default.aspx");
         }
@@ -165,8 +165,15 @@ namespace Corrlinks
             // Open Email box
             //mChrome.FindByAttr("a", "href", "Inbox.aspx", 1).Click();
             // Open new messages
+            int messageCount;
             try
             {
+                string alert = mChrome.FindById("ctl00_mainContentPlaceHolder_newMessageLink").Text;
+                var startPos = 9;
+                var endPos = alert.IndexOf(" unread");
+                string strMessageCount = alert.Substring(9, endPos - 9);
+                messageCount = Convert.ToInt32(strMessageCount);
+
                 mChrome.FindById("ctl00_mainContentPlaceHolder_newMessageLink").Click();
             } catch
             {
@@ -189,9 +196,6 @@ namespace Corrlinks
                 return;
             }
 
-            String htmlBody = tbodyWebElement.GetAttribute("innerHTML");
-            int messageCount = Regex.Matches(htmlBody, "<tr").Count - 1;
-
             for (int i = 0; i < messageCount; i++)
             {
                 try
@@ -209,7 +213,9 @@ namespace Corrlinks
                     message.TIMESTAMP = new DateTime();
 
                     inbox.Add(message);
-                    mChrome.FindById("ctl00_mainContentPlaceHolder_cancelButton").Click();
+                    SubmitInbox();
+                    
+                    mChrome.GoToUrl("https://www.corrlinks.com/Inbox.aspx?UnreadMessages");
                     
                     UpdateStatus("Read message from " + message.FROM);
                 }
@@ -239,6 +245,7 @@ namespace Corrlinks
                 mChrome.FindByAttr("textarea", "name", "message", 1).SendKeys(msg.MESSAGE);
                 mChrome.FindByAttr("input", "name", "submit", 1).Click();
             }
+            inbox.Clear();
         }
 
         private void ProcessOutbox()
@@ -256,7 +263,7 @@ namespace Corrlinks
                 k++;
                 SendMessage(messageOut);
                 messageOut = CheckOutbox();
-                if(k % 7 == 0)
+                //if(k % 7 == 0)
                     ValidateSentMessages();
             }
             UpdateStatus("Message checked out " + k.ToString());
