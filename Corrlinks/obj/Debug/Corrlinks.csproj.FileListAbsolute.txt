@@ -11,3 +11,6 @@ E:\Work\On\Auto mail sending\Corrlinks\Corrlinks\obj\Debug\Corrlinks.csproj.Gene
 E:\Work\On\Auto mail sending\Corrlinks\Corrlinks\obj\Debug\Corrlinks.exe
 E:\Work\On\Auto mail sending\Corrlinks\Corrlinks\obj\Debug\Corrlinks.pdb
 E:\Work\On\Auto mail sending\Corrlinks\Corrlinks\obj\Debug\Corrlinks.csprojResolveAssemblyReference.cache
+F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\bin\Debug\Corrlinks.exe.config
+F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\obj\Debug\Corrlinks.exe
+F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\obj\Debug\Corrlinks.pdb

@@ -337,6 +337,7 @@ namespace Corrlinks
             {
                 mChrome.FindById("ctl00_mainContentPlaceHolder_messageTextBox").SendKeys(msg.MESSAGE);
             }
+            Thread.Sleep(500);
 
             mChrome.TryCloseAlert();
 
@@ -365,16 +366,24 @@ namespace Corrlinks
                     addressFound = true;
                     mChrome.FindByXPath(tr + "/td[1]//input").Click();  
                     mChrome.FindById("ctl00_mainContentPlaceHolder_addressBox_okButton").Click();
-                    Thread.Sleep(1000);
+                    Thread.Sleep(3000);
 
                     mChrome.FindById("ctl00_mainContentPlaceHolder_sendMessageButton").Click();
+                    Thread.Sleep(3000);
                     UpdateStatus("Sent message to " + msg.INMATE_ID);
-                    Thread.Sleep(1000);
                     break;
                 }
             }
-            if(!addressFound)
+            if(!addressFound) // Send request if address not found
+            {
                 UpdateStatus("Address not found" + msg.INMATE_ID.ToString());
+
+                string validationURL = "http://ddtext.com/corrlinks/sentmessage-update.php?";
+                validationURL += "msgID[]=" + msg.INBOX_ID + "&" + "addressnotfound=" + msg.INMATE_ID;
+
+                string validationResult = MyUtil.GetRequest(validationURL);
+                UpdateStatus(validationResult);
+            }
             return addressFound;
         }
 
@@ -486,15 +495,23 @@ namespace Corrlinks
                 var endPos = alert.IndexOf(" new contact");
                 string strContactCount = alert.Substring(9, endPos - 9);
                 int contactCount = Convert.ToInt32(strContactCount);
+
+                // InmateID List to Add to database
+                List<String> inmateList = new List<string>();
                 for (int i = 0; i < contactCount; i++)
                 {
                     mChrome.SetTextByID("ctl00_mainContentPlaceHolder_PendingContactUC1_InmateNumberTextBox", codes[i]);
                     mChrome.FindById("ctl00_mainContentPlaceHolder_PendingContactUC1_SearchButton").Click();
                     Thread.Sleep(1000);
+
+                    IWebElement inmateIDEle = mChrome.FindById("ctl00_mainContentPlaceHolder_PendingContactUC1_inmateNumberDataLabel");
+                    if(inmateIDEle != null) inmateList.Add(inmateIDEle.Text);
+
                     IWebElement acceptBtn = mChrome.FindById("ctl00_mainContentPlaceHolder_PendingContactUC1_addInmateButton");
                     if (acceptBtn != null) acceptBtn.Click();
                     Thread.Sleep(2000);
                 }
+                AddInmateFromIDCode(inmateList);
             }
             catch (Exception ex)
             {
@@ -512,6 +529,19 @@ namespace Corrlinks
             if (openBrowserThread != null) openBrowserThread.Abort();
             if (mainProcessingThread != null) mainProcessingThread.Abort();
             UpdateStatus("Stopped Read/Send cycle...");
+        }
+
+        private void AddInmateFromIDCode(List<string> inmateIDs)
+        {
+            UpdateStatus(statusSeperator);
+            UpdateStatus("Adding Inmate From ID Code");
+            for(int i = 0; i < inmateIDs.Count; i ++)
+            {
+                UpdateStatus("Adding Inmate ID: " + inmateIDs[i]);
+                String url = "http://ddtext.com/corrlinks/add-inmate-from-IDcode.php?inmateID=" + inmateIDs[i];
+                MyUtil.GetRequest(url);
+            }
+            UpdateStatus(statusSeperator);
         }
     }
 }
