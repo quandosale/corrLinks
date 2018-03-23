@@ -151,7 +151,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Corrlinks Automation - v1.7";
+            this.Text = "Corrlinks Automation - v1.8";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.onClose);
             this.ResumeLayout(false);
             this.PerformLayout();

@@ -12,5 +12,14 @@ E:\Work\On\Auto mail sending\Corrlinks\Corrlinks\obj\Debug\Corrlinks.exe
 E:\Work\On\Auto mail sending\Corrlinks\Corrlinks\obj\Debug\Corrlinks.pdb
 E:\Work\On\Auto mail sending\Corrlinks\Corrlinks\obj\Debug\Corrlinks.csprojResolveAssemblyReference.cache
 F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\bin\Debug\Corrlinks.exe.config
+F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\bin\Debug\Corrlinks.exe
+F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\bin\Debug\Corrlinks.pdb
+F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\bin\Debug\WebDriver.dll
+F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\bin\Debug\WebDriver.Support.dll
+F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\bin\Debug\WebDriver.xml
+F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\bin\Debug\WebDriver.Support.xml
+F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\obj\Debug\Corrlinks.Form1.resources
+F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\obj\Debug\Corrlinks.Properties.Resources.resources
+F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\obj\Debug\Corrlinks.csproj.GenerateResource.Cache
 F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\obj\Debug\Corrlinks.exe
 F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\obj\Debug\Corrlinks.pdb

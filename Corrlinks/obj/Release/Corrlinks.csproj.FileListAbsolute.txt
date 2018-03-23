@@ -1,0 +1,12 @@
+F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\bin\Release\Corrlinks.exe.config
+F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\bin\Release\Corrlinks.exe
+F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\bin\Release\Corrlinks.pdb
+F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\bin\Release\WebDriver.dll
+F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\bin\Release\WebDriver.Support.dll
+F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\bin\Release\WebDriver.xml
+F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\bin\Release\WebDriver.Support.xml
+F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\obj\Release\Corrlinks.Form1.resources
+F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\obj\Release\Corrlinks.Properties.Resources.resources
+F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\obj\Release\Corrlinks.csproj.GenerateResource.Cache
+F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\obj\Release\Corrlinks.exe
+F:\Work\On\Auto mail sending\Corrlinks\Corrlinks\obj\Release\Corrlinks.pdb
