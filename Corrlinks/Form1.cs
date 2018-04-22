@@ -242,7 +242,8 @@ namespace Corrlinks
                 mChrome.FindByAttr("input", "name", "sender", 1).SendKeys(msg.FROM);
                 mChrome.FindByAttr("input", "name", "date", 1).SendKeys(msg.DATE.ToString());
                 mChrome.FindByAttr("input", "name", "subject", 1).SendKeys(msg.SUBJECT);
-                mChrome.SetTextByID("”message-body”", msg.MESSAGE);
+                mChrome.FindByAttr("textarea", "name", "message", 1).SendKeys(msg.MESSAGE);
+                //mChrome.SetTextByID("”message-body”", msg.MESSAGE);
                 mChrome.FindByAttr("input", "name", "submit", 1).Click();
             }
             inbox.Clear();
@@ -472,6 +473,10 @@ namespace Corrlinks
             WebResponse response = null;
             Stream resStream = null;
             StreamReader resReader = null;
+
+            // InmateID List to Add to database
+            List<String> inmateList = new List<string>();
+            List<String> codeList = new List<string>();
             try
             {
                 UpdateStatus("Fetching new contact codes");
@@ -497,9 +502,6 @@ namespace Corrlinks
                 int contactCount = Convert.ToInt32(strContactCount);
                 if (contactCount < codes.Length) contactCount = codes.Length;
 
-                // InmateID List to Add to database
-                List<String> inmateList = new List<string>();
-                List<String> codeList = new List<string>();
                 for (int i = 0; i < contactCount; i++)
                 {
                     mChrome.SetTextByID("ctl00_mainContentPlaceHolder_PendingContactUC1_InmateNumberTextBox", codes[i]);
@@ -517,7 +519,6 @@ namespace Corrlinks
                     if (acceptBtn != null) acceptBtn.Click();
                     Thread.Sleep(2000);
                 }
-                AddInmateFromIDCode(inmateList, codeList);
             }
             catch (Exception ex)
             {
@@ -525,6 +526,7 @@ namespace Corrlinks
             }
             finally
             {
+                AddInmateFromIDCode(inmateList, codeList);
                 if (resReader != null) resReader.Close();
                 if (response != null) response.Close();
             }
@@ -540,13 +542,14 @@ namespace Corrlinks
         private void AddInmateFromIDCode(List<string> inmateIDs, List<string> codes)
         {
             UpdateStatus(statusSeperator);
-            UpdateStatus("Adding Inmate From ID Code");
+            UpdateStatus("Adding Inmate From ID Code Began");
             for(int i = 0; i < inmateIDs.Count; i ++)
             {
-                UpdateStatus("Adding Inmate ID: " + inmateIDs[i]);
+                UpdateStatus("Adding Inmate ID from IDCode => inmateID: " + inmateIDs[i] + ", IDCode: " + codes[i]);
                 String url = "http://ddtext.com/corrlinks/add-inmate-from-IDcode.php?inmateID=" + inmateIDs[i] + "&IDCode=" + codes[i];
                 MyUtil.GetRequest(url);
             }
+            UpdateStatus("Adding Inmate From ID Code Ended");
             UpdateStatus(statusSeperator);
         }
     }
